@@ -16,7 +16,7 @@ export async function fetchRevenue() {
     // Artificially delay a response for demo purposes.
     // Don't do this in production :)
 
-    // console.log('Fetching revenue data...');
+    console.log('Fetching revenue data...');
     // await new Promise((resolve) => setTimeout(resolve, 3000));
 
     const data = await sql<Revenue[]>`SELECT * FROM revenue`;
@@ -61,6 +61,9 @@ export async function fetchCardData() {
          SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
          SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
          FROM invoices`;
+         // "paid": Sums up the amount column for all records where status is 'paid'.
+         // "pending": Sums up the amount column for all records where status is 'pending'.
+         // If an invoice status is neither 'paid' nor 'pending' (e.g., 'failed', 'cancelled'), the query contributes 0 to both sums.
 
     const data = await Promise.all([
       invoiceCountPromise,
@@ -160,6 +163,7 @@ export async function fetchInvoiceById(id: string) {
       amount: invoice.amount / 100,
     }));
 
+    console.log(invoice);
     return invoice[0];
   } catch (error) {
     console.error('Database Error:', error);
